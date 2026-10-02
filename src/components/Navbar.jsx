@@ -6,9 +6,9 @@ function Navbar() {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
 
 
   // GET CURRENT USER
@@ -21,16 +21,22 @@ function Navbar() {
   }
 
 
+  // LOAD CURRENT USER
+  useEffect(() => {
+
+    setCurrentUser(getCurrentUser());
+
+  }, []);
+
+
   // UPDATE CART COUNT
   useEffect(() => {
 
     function updateCartCount() {
 
-      const currentUser =
-        getCurrentUser();
+      const user = getCurrentUser();
 
-
-      if (!currentUser) {
+      if (!user) {
 
         setCartCount(0);
         return;
@@ -38,9 +44,7 @@ function Navbar() {
       }
 
 
-      const cartKey =
-        `cart_${currentUser.id}`;
-
+      const cartKey = `cart_${user.id}`;
 
       const cart =
         JSON.parse(
@@ -79,11 +83,9 @@ function Navbar() {
 
     function updateWishlistCount() {
 
-      const currentUser =
-        getCurrentUser();
+      const user = getCurrentUser();
 
-
-      if (!currentUser) {
+      if (!user) {
 
         setWishlistCount(0);
         return;
@@ -92,7 +94,7 @@ function Navbar() {
 
 
       const wishlistKey =
-        `wishlist_${currentUser.id}`;
+        `wishlist_${user.id}`;
 
 
       const wishlist =
@@ -163,6 +165,7 @@ function Navbar() {
     );
 
 
+    setCurrentUser(null);
     setCartCount(0);
     setWishlistCount(0);
 
@@ -172,14 +175,12 @@ function Navbar() {
   }
 
 
-  const currentUser =
-    getCurrentUser();
-
-
   return (
 
     <nav className="navbar">
 
+
+      {/* LOGO */}
 
       <Link
         to="/"
@@ -188,6 +189,8 @@ function Navbar() {
         ShopNest
       </Link>
 
+
+      {/* SEARCH */}
 
       <form
         className="search-box"
@@ -211,7 +214,10 @@ function Navbar() {
       </form>
 
 
+      {/* NAVIGATION */}
+
       <div className="nav-links">
+
 
         <Link to="/">
           Home
@@ -233,21 +239,34 @@ function Navbar() {
         </Link>
 
 
-        {currentUser && (
+        {/* LOGGED IN / LOGGED OUT */}
 
-          <span className="user-name">
-            Hi, {currentUser.name}
-          </span>
+        {currentUser ? (
+
+          <>
+
+            <span className="user-name">
+              Hi, {currentUser.name}
+            </span>
+
+
+            <button
+              onClick={logout}
+              className="logout-btn"
+            >
+              Logout
+            </button>
+
+          </>
+
+        ) : (
+
+          <Link to="/login">
+            Login
+          </Link>
 
         )}
 
-
-        <button
-          onClick={logout}
-          className="logout-btn"
-        >
-          Logout
-        </button>
 
       </div>
 
